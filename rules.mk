@@ -22,7 +22,8 @@ ifeq ($(ARCH),aarch64)
 ARCH = arm64
 endif
 
-arches := amd64 arm64
+#arches := amd64 arm64
+arches := amd64
 modes := rel dbg
 
 hook-bootkit-deps := $(wildcard hook-bootkit/*)
@@ -38,7 +39,7 @@ $$(shell mkdir -p out/$T/$(mode)/$(arch))
 image-$(mode)-$(arch): out/$T/$(mode)/$(arch)/hook.tar
 
 out/$T/$(mode)/$(arch)/hook.tar: out/$T/$(mode)/$(arch)/hook.yaml out/$T/hook-bootkit-$(arch) out/$T/hook-docker-$(arch)
-	linuxkit build -docker -arch $(arch) -format tar-kernel-initrd -name hook -dir $$(@D) $$<
+	linuxkit build --docker --arch $(arch) --format tar-kernel-initrd --name hook --dir $$(@D) $$<
 	mv $$(@D)/hook-initrd.tar $$@
 
 out/$T/$(mode)/$(arch)/cmdline out/$T/$(mode)/$(arch)/initrd.img out/$T/$(mode)/$(arch)/kernel: out/$T/$(mode)/$(arch)/hook.tar
@@ -76,7 +77,7 @@ run-$(arch):
 	mkdir -p out/$T/run/$(arch)
 	tar --overwrite -xf $$^ -C out/$T/run/$(arch) --transform 's/^/hook-/'
 	grep -q "tink_worker_image=quay.io/tinkerbell/tink-worker:latest" out/$T/run/$(arch)/hook-cmdline || sed -i 's?^?tink_worker_image=quay.io/tinkerbell/tink-worker:latest ?' out/$T/run/$(arch)/hook-cmdline
-	linuxkit run qemu --mem 2048 -kernel out/$T/run/$(arch)/hook
+	linuxkit run qemu --mem 2048 --kernel out/$T/run/$(arch)/hook
 endef
 $(foreach a,$(arches),$(eval $(call foreach_arch_rules,$a)))
 
@@ -90,7 +91,8 @@ push-hook-bootkit push-hook-docker:
 	docker buildx build --platform $$platforms --push -t $(ORG)/$(container):$T $(container)
 
 .PHONY: dist
-dist: out/$T/rel/amd64/hook.tar out/$T/rel/arm64/hook.tar ## Build tarballs for distribution
+#dist: out/$T/rel/amd64/hook.tar out/$T/rel/arm64/hook.tar ## Build tarballs for distribution
+dist: out/$T/rel/amd64/hook.tar
 dbg-dist: out/$T/dbg/$(ARCH)/hook.tar ## Build debug enabled tarball
 dist dbg-dist:
 	for f in $^; do
