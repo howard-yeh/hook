@@ -69,6 +69,7 @@ services:
       - /var/run/docker:/var/run
       - /var/run/images:/var/lib/docker
       - /var/run/worker:/worker
+      - /etc/hosts:/etc/hosts
     runtime:
       mkdir:
         - /var/run/images
@@ -98,6 +99,7 @@ files:
       alias       docker='ctr -n services.linuxkit tasks exec --tty --exec-id cmd hook-docker docker'
       alias docker-shell='ctr -n services.linuxkit tasks exec --tty --exec-id shell hook-docker sh'
       name_version=$(grep PRETTY_NAME= /etc/os-release | cut -d'=' -f2 | tr -d '"')
+      echo "192.168.152.33 tcrtst.fab.tsmc.com" >> /etc/hosts
       export PS1='${name_version}:\w\$ '
       # Disable kernel messages on console
       echo 4 > /proc/sys/kernel/printk

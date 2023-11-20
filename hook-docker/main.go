@@ -16,7 +16,7 @@ type tinkConfig struct {
 	httpProxy          string
 	httpsProxy         string
 	noProxy            string
-	host               string
+	//host               string
 }
 
 type dockerConfig struct {
@@ -56,8 +56,8 @@ func run() error {
 	}
 
 	// Build the command, and execute
-	host := []byte(cfg.host)
-	os.WriteFile("/etc/hosts",host,0644)
+	//host := []byte(cfg.host)
+	//os.WriteFile("/etc/hosts",host,0644)
 	cmd := exec.Command("/usr/local/bin/docker-init", "/usr/local/bin/dockerd")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -120,8 +120,8 @@ func parseCmdLine(cmdLines []string) (cfg tinkConfig) {
 			cfg.httpsProxy = cmdLine[1]
 		case "NO_PROXY":
 			cfg.noProxy = cmdLine[1]
-		case "host":
-			cfg.host = cmdLine[1]
+		/*case "host":
+			cfg.host = cmdLine[1]*/
 		}
 	}
 	return cfg
